@@ -5,38 +5,29 @@ function Book(book) {
     this.author = book.author || 'anonymous';
     this.numPages = book.numPages;
     this.hasRead = book.hasRead || false;
-    this.pagesRead = book.pagesRead || 0;
+    if(hasRead)
+        this.pagesRead = this.numPages;
+    else 
+        this.pagesRead = book.pagesRead || 0;
 }
-
-
-//DOM Elements
-/* 
-            <div class = 'books'>
-                <div class = 'add'>+</div>
-                <div class='text'></div>
-                <div class='remove'>-</div>
-            </div>
-
-*/
 
 let shelf = document.getElementsByClassName('shelves')[0],
 plusBttn = document.getElementById('plus');
 
 let len = 0, total = 0;
 
-function addBookToLibrary(book = {}) {
+function addBookToLibrary() {
     if(total >= 28*2)
         return;
-    if(len >= 28){
+    if(len >= 28)
         shelf = document.getElementsByClassName('shelves')[1];
-        len = 0;
-    }
+
     let bookDiv = document.createElement('div');
     bookDiv.classList.add('books');
 
     let addBttn = document.createElement('div');
-    addBttn.classList.add('add');
-    addBttn.innerText = '+';
+    addBttn.classList.add('info');
+    addBttn.innerText = '!';
 
     let  text = document.createElement('div');
     text.classList.add('text');
@@ -51,19 +42,80 @@ function addBookToLibrary(book = {}) {
     bookDiv.appendChild(text);
     bookDiv.appendChild(removeBttn);
     total++;
-    myLibrary.push(book);
 }
 
-plusBttn.addEventListener('click', addBookToLibrary);
-
-window.addEventListener('click', () =>{
-    let removeBttns = document.getElementsByClassName('remove');
-    for (let el of removeBttns) {
-        el.addEventListener('click', event => {
-            event.target.parentElement.remove();
-            len--;
-            total--;
-        });
-    }
+plusBttn.addEventListener('click', () => {
+    let form = document.createElement('div');
+    form.classList.add('form');
+    form.innerHTML = 
+    `<h2>New Book</h2>
+    <div class = 'cross'>x</div>
+    Name:
+    <input type = 'text' data-type = 'name' required>
+    Author:
+    <input type = 'text' data-type = 'author' required>
+    Pages:
+    <input type = 'number' data-type = 'numPages' required>
+    Have Read:
+    <input type= 'checkbox' data-type = 'hasRead'>
+    Pages Read:
+    <input type='number' data-type = 'pagesRead'>
+    <input type ='submit'></input>`;
+    document.body.appendChild(form);
+    addBookToLibrary();
 });
 
+//Event Delegator
+
+document.body.addEventListener('click', (event) =>{
+
+    if (event.target && event.target.classList.contains('remove')){
+        event.target.parentElement.remove();
+    }
+
+    if(event.target && event.target.type && event.target.type === 'submit'){
+        let formEl = event.target.parentElement;
+        let book = {};
+        formEl.querySelectorAll('input')
+        .forEach(inpEl => {
+            if (inpEl.getAttribute("data-type")) {
+                if (inpEl.getAttribute("data-type") === 'haveRead')
+                    book[inpEl.getAttribute("data-type")] = inpEl.checked;
+                else
+                    book[inpEl.getAttribute("data-type")] = inpEl.value;
+            }
+        });
+        myLibrary.push(book);
+        formEl.remove();
+    }
+
+    if(event.target && event.target.classList.contains('cross')){
+        event.target.parentElement.remove();
+    }
+
+    if(event.target && event.target.classList.contains('info')){
+        let formEl = document.createElement('div'),
+        cross = document.createElement('div'),
+        display = document.createElement('div'),
+        book = event.target.nextSibling.innerText;
+        
+        book = myLibrary[(+book)-1];
+        formEl.classList.add('form');
+        cross.classList.add('cross');
+        display.classList.add('book-dets');
+        
+        formEl.style.background = 'purple';
+        cross.innerText = 'x';
+        display.innerHTML = 
+        `Name: ${book.name} <br>
+        Author: ${book.author}<br>
+        Page Length: ${book.numPages}<br>
+        Pages-Read: ${book.pagesRead}<br>
+        Read: ${(book.hasRead) ? 'Yes' : 'No'} <br>`
+        ;
+
+        formEl.appendChild(cross);
+        formEl.appendChild(display);
+        document.body.appendChild(formEl);
+    }
+});
