@@ -37,13 +37,13 @@ h1{
     font-size: 2rem;
     text-align: center;
     background:linear-gradient(0deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),url('https://bit.ly/3hPNCjH');
-
+    height: 2rem;
 }
 
 .shelves{
     display: flex;
     height: 12rem;
-    border: 1px solid #FFF;
+    background-color: rgba(0, 0, 0, 0.7);
 }
 
 .books{
